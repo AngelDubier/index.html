@@ -28,7 +28,7 @@
   <div id="m"></div>
 </form>
 <script>
-  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzTghpVrDM7f7ldWEJVhtN2pa0HWT5mjM2Ea3gy7AXZZXgbm5MDm4pPfuisGZl1tMYj/exec"; // <-- pega aquí tu URL que termina en /exec
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbystdw2UYgtDjcpx7hIIfDocXkuXSi72_sOCtmWQxh0aM-2EXxDzYxkB0TbFnrEyvJX/exec"; // <-- pega aquí tu URL que termina en /exec
   const f = document.getElementById('f'), m = document.getElementById('m');
   f.addEventListener('submit', async ev => {
     ev.preventDefault(); m.textContent = "Enviando..."; m.className = "";
