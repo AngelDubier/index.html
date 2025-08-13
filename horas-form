@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Registro de Horas en Obra</title>
+<style>
+  body{font-family:system-ui,Arial;margin:24px auto;max-width:720px;padding:0 16px}
+  form{display:grid;gap:12px} label{font-weight:600} input,textarea,button{padding:10px}
+  .row{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+  .ok{color:#0a7f2e}.err{color:#b00020}
+</style>
+<h1>Registro de Horas en Obra</h1>
+<form id="f">
+  <div class="row">
+    <div><label>Nombre *</label><input name="Nombre" required></div>
+    <div><label>Cargo *</label><input name="Cargo" required></div>
+  </div>
+  <div class="row">
+    <div><label>Obra *</label><input name="Obra" required></div>
+    <div><label>Fecha *</label><input type="date" name="Fecha" required></div>
+  </div>
+  <div><label>Actividad *</label><textarea name="Actividad" rows="3" required></textarea></div>
+  <div class="row">
+    <div><label>Hora inicio *</label><input type="time" name="HoraInicio" required></div>
+    <div><label>Hora Fin *</label><input type="time" name="HoraFin" required></div>
+  </div>
+  <button>Enviar</button>
+  <div id="m"></div>
+</form>
+<script>
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzTghpVrDM7f7ldWEJVhtN2pa0HWT5mjM2Ea3gy7AXZZXgbm5MDm4pPfuisGZl1tMYj/exec"; // <-- pega aquí tu URL que termina en /exec
+  const f = document.getElementById('f'), m = document.getElementById('m');
+  f.addEventListener('submit', async ev => {
+    ev.preventDefault(); m.textContent = "Enviando..."; m.className = "";
+    const fd = new FormData(f);
+    const body = new URLSearchParams([...fd.entries()]).toString();
+    try {
+      await fetch(WEBAPP_URL, { method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'}, body });
+      m.textContent = "¡Enviado!"; m.className = "ok"; f.reset();
+    } catch(e){ m.textContent = "No se pudo enviar. Revisa la URL /exec."; m.className = "err"; }
+  });
+</script>
+</html>
