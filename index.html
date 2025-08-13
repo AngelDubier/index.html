@@ -1,44 +1,168 @@
 <!doctype html>
 <html lang="es">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Registro de Horas en Obra</title>
-<style>
-  body{font-family:system-ui,Arial;margin:24px auto;max-width:720px;padding:0 16px}
-  form{display:grid;gap:12px} label{font-weight:600} input,textarea,button{padding:10px}
-  .row{display:grid;gap:12px;grid-template-columns:1fr 1fr}
-  .ok{color:#0a7f2e}.err{color:#b00020}
-</style>
-<h1>Registro de Horas en Obra</h1>
-<form id="f">
-  <div class="row">
-    <div><label>Nombre *</label><input name="Nombre" required></div>
-    <div><label>Cargo *</label><input name="Cargo" required></div>
-  </div>
-  <div class="row">
-    <div><label>Obra *</label><input name="Obra" required></div>
-    <div><label>Fecha *</label><input type="date" name="Fecha" required></div>
-  </div>
-  <div><label>Actividad *</label><textarea name="Actividad" rows="3" required></textarea></div>
-  <div class="row">
-    <div><label>Hora inicio *</label><input type="time" name="HoraInicio" required></div>
-    <div><label>Hora Fin *</label><input type="time" name="HoraFin" required></div>
-  </div>
-  <button>Enviar</button>
-  <div id="m"></div>
-</form>
-<script>
-  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw7P6xOhGpe3CY8vAYDDLCb9e1JokROoF5FC9UgU6nJ_iGK4-OJ8CpXDWmfOyh4cKaO/exec"; // <-- pega aquí tu URL que termina en /exec
-  const f = document.getElementById('f'), m = document.getElementById('m');
-  f.addEventListener('submit', async ev => {
-    ev.preventDefault(); m.textContent = "Enviando..."; m.className = "";
-    const fd = new FormData(f);
-    const body = new URLSearchParams([...fd.entries()]).toString();
-    try {
-      await fetch(WEBAPP_URL, { method:'POST', mode:'no-cors',
-        headers:{'Content-Type':'application/x-www-form-urlencoded'}, body });
-      m.textContent = "¡Enviado!"; m.className = "ok"; f.reset();
-    } catch(e){ m.textContent = "No se pudo enviar. Revisa la URL /exec."; m.className = "err"; }
-  });
-</script>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registro de Horas en Obra</title>
+  <style>
+    :root{
+      --bg:#0f172a; --accent:#0ea5e9; --card:#ffffff; --muted:#64748b; --text:#0f172a;
+      --radius:16px; --shadow:0 12px 30px rgba(15,23,42,.12);
+      --maxw:820px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#eaf3ff, #f6f7fb 40%) fixed;color:var(--text)}
+    header{background:var(--bg); color:#fff}
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:16px}
+    .brand{display:flex;align-items:center;gap:14px;padding:14px 0}
+    .brand img{height:44px;width:auto;border-radius:10px}
+    .brand h1{font-size:18px;margin:0}
+    .brand small{opacity:.85}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin:24px 0}
+    h2{margin:0 0 6px;font-size:22px}
+    p.lead{margin:0 0 18px;color:var(--muted)}
+    form{display:grid;gap:16px}
+    label{font-weight:650;color:var(--text);display:block;margin-bottom:6px}
+    input,textarea,select,button{
+      width:100%;padding:12px 13px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;font-size:14px;
+      transition:border-color .15s, box-shadow .15s, transform .02s;
+    }
+    input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(14,165,233,.15)}
+    textarea{resize:vertical;min-height:82px}
+    .row{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+    @media (max-width:720px){.row{grid-template-columns:1fr}}
+    button{background:var(--accent);color:#fff;border:none;font-weight:800;cursor:pointer}
+    button:hover{filter:brightness(.97)}
+    button:active{transform:translateY(1px)}
+    .msg{min-height:22px;font-weight:700}
+    .ok{color:#0a7f2e}.err{color:#b00020}
+    footer{margin-top:10px;color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap brand">
+      <img src="img/logo.jpg" alt="Logo empresa">
+      <div>
+        <h1>Registro de Horas</h1>
+        <small>Constructoras · Control de tiempos</small>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="card">
+      <h2>Reporte de Actividades</h2>
+      <p class="lead">Campos obligatorios marcados con *. Seleccioná la obra desde la lista para evitar errores.</p>
+
+      <form id="frm" autocomplete="off">
+        <div class="row">
+          <div>
+            <label>Nombre *</label>
+            <input name="Nombre" required />
+          </div>
+          <div>
+            <label>Apellido *</label>
+            <input name="Apellido" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Cargo *</label>
+            <input name="Cargo" required />
+          </div>
+          <div>
+            <label>Obra *</label>
+            <select name="Obra" required>
+              <option value="">Seleccione…</option>
+              <option>ADMINISTRATIVO</option>
+              <option>ALOJAMIENTO PAILA ARRIBA</option>
+              <option>EQUIPOS</option>
+              <option>AVIDESA</option>
+              <option>BODEGA G4</option>
+              <option>MORAGUA PAVIMENTO</option>
+              <option>BODEGA G5</option>
+              <option>CRISTAR</option>
+              <option>FILTRO PRENSA LEVAPAN</option>
+              <option>CALIMA REPARACION</option>
+              <option>FISCALIA GARANTIA</option>
+              <option>CRISTAR MANZANO</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Fecha *</label>
+            <input type="date" name="Fecha" required />
+          </div>
+          <div>
+            <label>Hora inicio *</label>
+            <input type="time" name="HoraInicio" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Hora Fin *</label>
+            <input type="time" name="HoraFin" required />
+          </div>
+          <div>
+            <label>Actividad *</label>
+            <input name="Actividad" required />
+          </div>
+        </div>
+
+        <button type="submit" id="btn">Enviar</button>
+        <div id="msg" class="msg"></div>
+      </form>
+
+      <footer>
+        Columnas (hoja <strong>Respuestas</strong>): Marca de tiempo | Nombre | Apellido | Cargo | Obra | Fecha | Actividad | Hora inicio | Hora Fin | Total Horas
+      </footer>
+    </div>
+  </main>
+
+  <script>
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyG5sJEdxhy1LtvIrBaMylrGrBCkQPuJE8yY0YReRS6o6prrjQHasooJqSunLZ7Wg1Y/exec"; // <-- pegá aquí tu URL de Apps Script (termina en /exec)
+
+    const frm = document.getElementById('frm');
+    const btn = document.getElementById('btn');
+    const msg = document.getElementById('msg');
+
+    frm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      msg.textContent = "Enviando…"; msg.className = "msg";
+      btn.disabled = true;
+
+      const fd = new FormData(frm);
+      const params = new URLSearchParams({
+        Nombre: fd.get('Nombre') || '',
+        Apellido: fd.get('Apellido') || '',
+        Cargo: fd.get('Cargo') || '',
+        Obra: fd.get('Obra') || '',
+        Fecha: fd.get('Fecha') || '',
+        Actividad: fd.get('Actividad') || '',
+        HoraInicio: fd.get('HoraInicio') || '',
+        HoraFin: fd.get('HoraFin') || ''
+      });
+
+      try {
+        await fetch(WEBAPP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params.toString()
+        });
+        msg.textContent = "¡Enviado!"; msg.className = "msg ok";
+        frm.reset();
+      } catch (e) {
+        msg.textContent = "No se pudo enviar. Revisá la URL /exec del Apps Script."; msg.className = "msg err";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
 </html>
